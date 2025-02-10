@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-faster/jx"
 	"github.com/goccy/go-json"
+	"github.com/mailru/easyjson/jwriter"
 )
 
 func BenchmarkEncoding(b *testing.B) {
@@ -42,6 +43,16 @@ func BenchmarkEncoding(b *testing.B) {
 			if _, err := stdlib.Marshal(s); err != nil {
 				b.Fatal(err)
 			}
+		}
+	})
+	b.Run("easyjson", func(b *testing.B) {
+		b.ReportAllocs()
+
+		w := &jwriter.Writer{}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			w.Buffer.Buf = w.Buffer.Buf[:0]
+			s.MarshalEasyJSON(w)
 		}
 	})
 }
