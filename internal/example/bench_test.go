@@ -38,9 +38,10 @@ func BenchmarkEncoding(b *testing.B) {
 	})
 	b.Run("stdlib", func(b *testing.B) {
 		b.ReportAllocs()
+		e := stdlib.NewEncoder(io.Discard)
 
 		for i := 0; i < b.N; i++ {
-			if _, err := stdlib.Marshal(s); err != nil {
+			if err := e.Encode(s); err != nil {
 				b.Fatal(err)
 			}
 		}
