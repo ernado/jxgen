@@ -1,0 +1,8 @@
+{{- /*gotype:  github.com/ernado/jxgen/internal/gen.structDef*/ -}}
+{{ define "decode" }}{{ $s := . }}
+
+func ({{ $s.Receiver }} *{{ $s.Name }}) DecodeJSON(d *jx.Decoder) error {
+	return nil
+}
+
+{{ end }}

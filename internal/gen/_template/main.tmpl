@@ -1,0 +1,13 @@
+{{- /*gotype: github.com/ernado/jxgen/internal/gen.config*/ -}}
+
+{{ define "main" }}
+{{ $pkg := $.Package }}
+{{ template "header" $ }}
+
+{{ range $s := $.Structs }}
+{{ template "struct" $s }}
+{{ template "encode" $s }}
+{{ template "decode" $s }}
+{{ end }}
+
+{{- end }}

@@ -1,0 +1,8 @@
+{{- /*gotype:  github.com/ernado/jxgen/internal/gen.structDef*/ -}}
+{{ define "struct" }}{{ $s := . }}
+// Ensuring interfaces in compile-time for {{ $s.Name }}.
+var (
+    _ jxgen.Encoder = &{{ $s.Name }}{}
+    _ jggen.Decoder = &{{ $s.Name }}{}
+)
+{{ end }}
