@@ -1,10 +1,12 @@
 package example
 
 import (
+	"bytes"
 	stdlib "encoding/json"
 	"io"
 	"testing"
 
+	"github.com/bytedance/sonic"
 	"github.com/go-faster/jx"
 	"github.com/goccy/go-json"
 	"github.com/mailru/easyjson/jwriter"
@@ -54,6 +56,19 @@ func BenchmarkEncoding(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			w.Buffer.Buf = w.Buffer.Buf[:0]
 			s.MarshalEasyJSON(w)
+		}
+	})
+	b.Run("sonic", func(b *testing.B) {
+		b.ReportAllocs()
+
+		w := bytes.NewBuffer(nil)
+		enc := sonic.ConfigFastest.NewEncoder(w)
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			if err := enc.Encode(s); err != nil {
+				b.Fatal(err)
+			}
 		}
 	})
 }
