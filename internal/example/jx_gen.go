@@ -23,3 +23,53 @@ var (
 	_ = errors.Is
 	_ = sort.Ints
 )
+
+// Struct
+
+// Ensuring interfaces in compile-time for Struct.
+var (
+	_ jxgen.Encoder = &Struct{}
+	_ jxgen.Decoder = &Struct{}
+)
+
+func (s *Struct) EncodeJSON(e *jx.Encoder) error {
+	{
+		// Field Name.
+		e.Field("name", func(e *jx.Encoder) {
+			e.Str(s.Name)
+		})
+	}
+	{
+		// Field Value.
+		e.Field("value", func(e *jx.Encoder) {
+			e.Int(s.Value)
+		})
+	}
+	return nil
+}
+
+func (s *Struct) DecodeJSON(d *jx.Decoder) error {
+	return nil
+}
+
+// Struct
+
+// Ensuring interfaces in compile-time for Second.
+var (
+	_ jxgen.Encoder = &Second{}
+	_ jxgen.Decoder = &Second{}
+)
+
+func (s *Second) EncodeJSON(e *jx.Encoder) error {
+	{
+		// Field Kekus.
+		e.Field("kekus", func(e *jx.Encoder) {
+			e.Str(s.Kekus)
+		})
+	}
+	return nil
+}
+
+func (s *Second) DecodeJSON(d *jx.Decoder) error {
+	return nil
+}

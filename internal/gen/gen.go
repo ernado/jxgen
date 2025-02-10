@@ -50,11 +50,22 @@ type structDef struct {
 	Name string
 	// Receiver name. E.g. "m" for Message.
 	Receiver string
+
+	Fields []fieldDef
 }
 
 type Generator struct {
+	pkg *packages.Package
+
 	// structs definitions.
 	structs []structDef
+}
+
+type fieldDef struct {
+	Name         string
+	Key          string
+	EncodeMethod string
+	DecodeMethod string
 }
 
 // WriteSource writes generated definitions to fs.
@@ -73,12 +84,38 @@ func (g *Generator) WriteSource(fs FileSystem, pkgName string, t *template.Templ
 	return nil
 }
 
-func NewGenerator(pkg *packages.Package) (*Generator, error) {
-	g := &Generator{}
-	if pkg.Name == "" {
-		return nil, errors.New("package name is empty")
+func (g *Generator) encodeMethod(t types.Type) string {
+	switch t := t.(type) {
+	case *types.Basic:
+		switch t.Kind() {
+		case types.String:
+			return "Str"
+		case types.Int:
+			return "Int"
+		default:
+			panic("unhandled default case")
+		}
 	}
-	i := inspector.New(pkg.Syntax)
+	return "Encode"
+}
+
+func (g *Generator) decodeMethod(t types.Type) string {
+	switch t := t.(type) {
+	case *types.Basic:
+		switch t.Kind() {
+		case types.String:
+			return "Str"
+		case types.Int:
+			return "Int"
+		default:
+			panic("unhandled default case")
+		}
+	}
+	return "Decode"
+}
+
+func (g *Generator) makeStructs() error {
+	i := inspector.New(g.pkg.Syntax)
 	var toResolve []string
 	i.Nodes([]ast.Node{
 		&ast.GenDecl{},
@@ -101,13 +138,40 @@ func NewGenerator(pkg *packages.Package) (*Generator, error) {
 		return false
 	})
 	for _, name := range toResolve {
-		s := pkg.Types.Scope().Lookup(name).Type().Underlying().(*types.Struct)
+		s := g.pkg.Types.Scope().Lookup(name).Type().Underlying().(*types.Struct)
+		var fields []fieldDef
 		for i := 0; i < s.NumFields(); i++ {
 			field := s.Field(i)
 			tag := reflect.StructTag(s.Tag(i))
 			fmt.Printf("Field: %s, Type: %s, Tag: %s\n", field.Name(), field.Type(), tag.Get("json"))
+			fields = append(fields, fieldDef{
+				Name:         field.Name(),
+				Key:          tag.Get("json"),
+				EncodeMethod: g.encodeMethod(field.Type()),
+				DecodeMethod: g.decodeMethod(field.Type()),
+			})
 		}
+		fmt.Println("struct", name)
+		g.structs = append(g.structs, structDef{
+			Name:     name,
+			Receiver: strings.ToLower(name[:1]),
+			Fields:   fields,
+		})
 	}
+	return nil
+}
+
+func NewGenerator(pkg *packages.Package) (*Generator, error) {
+	g := &Generator{
+		pkg: pkg,
+	}
+	if pkg.Name == "" {
+		return nil, errors.New("package name is empty")
+	}
+	if err := g.makeStructs(); err != nil {
+		return nil, errors.Wrap(err, "make structs")
+	}
+
 	return g, nil
 }
 

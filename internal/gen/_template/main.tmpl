@@ -5,6 +5,7 @@
 {{ template "header" $ }}
 
 {{ range $s := $.Structs }}
+// Struct
 {{ template "struct" $s }}
 {{ template "encode" $s }}
 {{ template "decode" $s }}

@@ -3,6 +3,6 @@
 // Ensuring interfaces in compile-time for {{ $s.Name }}.
 var (
     _ jxgen.Encoder = &{{ $s.Name }}{}
-    _ jggen.Decoder = &{{ $s.Name }}{}
+    _ jxgen.Decoder = &{{ $s.Name }}{}
 )
 {{ end }}
