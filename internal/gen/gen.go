@@ -89,7 +89,7 @@ func (g *Generator) encodeMethod(t types.Type) string {
 	case *types.Basic:
 		switch t.Kind() {
 		case types.String:
-			return "Str"
+			return "StrEscape"
 		case types.Int:
 			return "Int"
 		default:

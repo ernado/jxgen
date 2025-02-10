@@ -34,7 +34,7 @@ var (
 func (s *Struct) EncodeJSON(e *jx.Encoder) error {
 	{
 		e.Field("name", func(e *jx.Encoder) {
-			e.Str(s.Name)
+			e.StrEscape(s.Name)
 		})
 	}
 	{
@@ -43,6 +43,18 @@ func (s *Struct) EncodeJSON(e *jx.Encoder) error {
 		})
 	}
 	return nil
+}
+
+func (s *Struct) WriteJSON(w *jx.Writer) {
+	{
+		w.FieldStart("name")
+		w.StrEscape(s.Name)
+	}
+	{
+		w.Comma()
+		w.FieldStart("value")
+		w.Int(s.Value)
+	}
 }
 
 // DecodeJSON implements jxgen.Encoder interface for Struct.
@@ -80,10 +92,17 @@ var (
 func (s *Second) EncodeJSON(e *jx.Encoder) error {
 	{
 		e.Field("kekus", func(e *jx.Encoder) {
-			e.Str(s.Kekus)
+			e.StrEscape(s.Kekus)
 		})
 	}
 	return nil
+}
+
+func (s *Second) WriteJSON(w *jx.Writer) {
+	{
+		w.FieldStart("kekus")
+		w.StrEscape(s.Kekus)
+	}
 }
 
 // DecodeJSON implements jxgen.Encoder interface for Second.

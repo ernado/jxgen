@@ -13,4 +13,17 @@ func ({{ $s.Receiver }} *{{ $s.Name }}) EncodeJSON(e *jx.Encoder) error {
     return nil
 }
 
+func ({{ $s.Receiver }} *{{ $s.Name }}) WriteJSON(w *jx.Writer)  {
+	{{- range $i, $f := $s.Fields }}
+	{
+		{{- if gt $i 0 }}
+		w.Comma()
+		{{- end }}
+		w.FieldStart("{{ $f.Key }}")
+		w.{{ $f.EncodeMethod }}({{ $s.Receiver }}.{{ $f.Name }})
+    }
+	{{- end }}
+}
+
+
 {{ end }}
