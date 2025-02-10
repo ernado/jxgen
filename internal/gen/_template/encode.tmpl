@@ -1,10 +1,10 @@
 {{- /*gotype:  github.com/ernado/jxgen/internal/gen.structDef*/ -}}
 {{ define "encode" }}{{ $s := . }}
 
+// EncodeJSON implements jxgen.Encoder interface for {{ $s.Name }}.
 func ({{ $s.Receiver }} *{{ $s.Name }}) EncodeJSON(e *jx.Encoder) error {
 	{{- range $f := $s.Fields }}
 	{
-		// Field {{ $f.Name }}.
         e.Field("{{ $f.Key }}", func(e *jx.Encoder) {
             e.{{ $f.EncodeMethod }}({{ $s.Receiver }}.{{ $f.Name }})
         })

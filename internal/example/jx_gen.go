@@ -4,12 +4,12 @@ package example
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/ernado/jxgen"
+	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
 )
 
@@ -24,23 +24,20 @@ var (
 	_ = sort.Ints
 )
 
-// Struct
-
 // Ensuring interfaces in compile-time for Struct.
 var (
 	_ jxgen.Encoder = &Struct{}
 	_ jxgen.Decoder = &Struct{}
 )
 
+// EncodeJSON implements jxgen.Encoder interface for Struct.
 func (s *Struct) EncodeJSON(e *jx.Encoder) error {
 	{
-		// Field Name.
 		e.Field("name", func(e *jx.Encoder) {
 			e.Str(s.Name)
 		})
 	}
 	{
-		// Field Value.
 		e.Field("value", func(e *jx.Encoder) {
 			e.Int(s.Value)
 		})
@@ -48,11 +45,30 @@ func (s *Struct) EncodeJSON(e *jx.Encoder) error {
 	return nil
 }
 
+// DecodeJSON implements jxgen.Encoder interface for Struct.
 func (s *Struct) DecodeJSON(d *jx.Decoder) error {
+	return d.ObjBytes(func(d *jx.Decoder, key []byte) error {
+		switch string(key) {
+		case "name":
+			v, err := d.Str()
+			if err != nil {
+				return errors.Wrap(err, "decode field Name (name)")
+			}
+			s.Name = v
+			return nil
+		case "value":
+			v, err := d.Int()
+			if err != nil {
+				return errors.Wrap(err, "decode field Value (value)")
+			}
+			s.Value = v
+			return nil
+		default:
+			return nil
+		}
+	})
 	return nil
 }
-
-// Struct
 
 // Ensuring interfaces in compile-time for Second.
 var (
@@ -60,9 +76,9 @@ var (
 	_ jxgen.Decoder = &Second{}
 )
 
+// EncodeJSON implements jxgen.Encoder interface for Second.
 func (s *Second) EncodeJSON(e *jx.Encoder) error {
 	{
-		// Field Kekus.
 		e.Field("kekus", func(e *jx.Encoder) {
 			e.Str(s.Kekus)
 		})
@@ -70,6 +86,20 @@ func (s *Second) EncodeJSON(e *jx.Encoder) error {
 	return nil
 }
 
+// DecodeJSON implements jxgen.Encoder interface for Second.
 func (s *Second) DecodeJSON(d *jx.Decoder) error {
+	return d.ObjBytes(func(d *jx.Decoder, key []byte) error {
+		switch string(key) {
+		case "kekus":
+			v, err := d.Str()
+			if err != nil {
+				return errors.Wrap(err, "decode field Kekus (kekus)")
+			}
+			s.Kekus = v
+			return nil
+		default:
+			return nil
+		}
+	})
 	return nil
 }

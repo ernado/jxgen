@@ -1,7 +1,23 @@
 {{- /*gotype:  github.com/ernado/jxgen/internal/gen.structDef*/ -}}
 {{ define "decode" }}{{ $s := . }}
 
+// DecodeJSON implements jxgen.Encoder interface for {{ $s.Name }}.
 func ({{ $s.Receiver }} *{{ $s.Name }}) DecodeJSON(d *jx.Decoder) error {
+	return d.ObjBytes(func(d *jx.Decoder, key []byte) error {
+		switch string(key) {
+		{{- range $f := $s.Fields }}
+		case "{{ $f.Key }}":
+			v, err := d.{{ $f.DecodeMethod }}()
+			if err != nil {
+				return errors.Wrap(err, "decode field {{ $f.Name }} ({{ $f.Key }})")
+			}
+			{{ $s.Receiver }}.{{ $f.Name }} = v
+			return nil
+		{{- end }}
+		default:
+			return nil
+		}
+	})
 	return nil
 }
 
